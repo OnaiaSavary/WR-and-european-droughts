@@ -133,6 +133,47 @@ def plot_lambert(champ, champ_contour, bounds, ax, fig, label, cm_norm, bounds_c
 
     return g
 
+def discretize_polygon(vertices, n):
+    vertices_discr = []
+    for i in range(len(vertices)):
+        start = np.array(vertices[i])
+        end = np.array(vertices[(i + 1) % len(vertices)])
+        for j in range(n + 1):
+            t = j / n
+            point = (1 - t) * start + t * end
+            vertices_discr.append(tuple(point))
+    return vertices_discr
+    
+
+def trace_clust(cluster_da, fill_clust,ax, label):
+    
+    INT_list = list(np.unique(cluster_da.clusters)[~np.isnan(np.unique(cluster_da.clusters))])
+    
+    
+    for i in INT_list:
+        mask = (cluster_da.clusters == i)
+        contour = ax.contour(
+            cluster_da.lon,
+            cluster_da.lat,
+            cluster_da.clusters == i, 
+            levels=[0.5, 1.5],
+            transform=ccrs.PlateCarree(),
+            colors='black',
+            linestyles='-',
+            linewidths=1
+        )
+    
+
+    if fill_clust == True :
+        cluster_da.clusters.plot(x='lon', y='lat', ax = ax, cmap='gnuplot', transform=ccrs.PlateCarree(), add_colorbar = False)
+
+    if label == True :
+        for i in range(1,len(INT_list)+1):
+            bary_x = np.mean(cluster_da.lon.where(cluster_da.clusters == i))
+            bary_y = np.mean(cluster_da.lat.where(cluster_da.clusters == i))
+            ax.text(bary_x, bary_y, i, transform=ccrs.PlateCarree(), fontsize = 20)
+    
+
 
 
 print('Importing clusters and regimes')
