@@ -42,7 +42,7 @@ Region = [16,17,18,19]
 
 
 print('Import pr')
-pr = xr.open_dataset('/home/savaryo/Bureau/These/ERA5/pr/pr.nc')
+pr = xr.open_dataset(repository + 'ERA5/pr/pr.nc')
 try:
     pr=pr.rename({'latitude': 'lat','longitude':'lon'})
 except:
@@ -53,7 +53,7 @@ pr['time']=pr.indexes['time'].normalize()
 #pr = pr.drop_vars('time_bnds')
 pr['pr'] = pr['pr'].assign_attrs({'units':'mm day-1'})
 
-mask_cluster = xr.open_dataset('/home/savaryo/Bureau/These/Clustering/mask_clust_'+mag_sech+'1_1991_2020.nc')
+mask_cluster = xr.open_dataset(repository + 'Clustering/mask_clust_'+mag_sech+'1_1991_2020.nc')
 pr_reg = pr.where(mask_cluster.clusters.isin([1,2,3,4,5,6,7]), drop = True).isel(time= slice(0,-16))
 
 #Supression des données maritimes
@@ -69,15 +69,15 @@ pr_reg = pr_reg.where(m)
 
 # Enregistrement du fichier
 print('Exporting pr')
-pr_reg.to_netcdf('/home/savaryo/Bureau/These/ERA5/pr/pr_land.nc', encoding = {"time": {"dtype": "double"},"pr": {"dtype": "double"},"lon": {"dtype": "double"},"lat": {"dtype": "double"}})
+pr_reg.to_netcdf(repository + 'ERA5/pr/pr_land.nc', encoding = {"time": {"dtype": "double"},"pr": {"dtype": "double"},"lon": {"dtype": "double"},"lat": {"dtype": "double"}})
 
-
+repository = '...'
 
 import pandas as pd
 from standard_precip import spi
 from standard_precip.utils import plot_index
 
-pr = xr.open_dataset('/home/savaryo/Bureau/These/ERA5/pr/pr_land.nc')
+pr = xr.open_dataset(repository + 'ERA5/pr/pr_land.nc')
 pr = pr.sel(time = pr['time'].dt.year.isin(np.arange(1960,2023)))
 
 
@@ -96,4 +96,4 @@ for lon_ind in range (0,len(pr.lon.values)) :
                 df_spi = spi_rain.calculate(pr_grid.reset_index(), 'time','pr', freq="D",scale=90,fit_type="lmom",dist_type="gam")
                 
                 SPI_calc['pr'][:,lat_ind,lon_ind] = df_spi.pr_scale_90_calculated_index.values
-SPI_calc.to_netcdf('/home/savaryo/Bureau/These/ERA5/SPI/SPI_daily_1960_2022.nc', encoding = {"time": {"dtype": "double"}})
+SPI_calc.to_netcdf(repository + 'ERA5/SPI/SPI_daily_1960_2022.nc', encoding = {"time": {"dtype": "double"}})
