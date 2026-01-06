@@ -123,7 +123,7 @@ def plot_lambert(champ, champ_contour, bounds, ax, fig, label, cm_norm, bounds_c
         levels = np.linspace(np.min(champ_contour),np.max(champ_contour),10)
         ax.contour(champ_contour.longitude.values,champ_contour.latitude.values,champ_contour, levels=levels,colors='white', transform=ccrs.PlateCarree(), linewidth = 2)
     
-    #cluster_da = xr.open_dataset('/home/savaryo/Bureau/These/1_WR_ERA5/Clustering/mask_clust_'+mag_sech+'1_1991_2020.nc')
+    #cluster_da = xr.open_dataset(repository + '1_WR_ERA5/Clustering/mask_clust_'+mag_sech+'1_1991_2020.nc')
     #trace_clust(cluster_da, fill_clust = False, ax=ax, label = True)
 
     if title != False:
@@ -177,12 +177,12 @@ def trace_clust(cluster_da, fill_clust,ax, label):
 
 
 print('Importing clusters and regimes')
-mask_cluster = xr.open_dataset('/home/savaryo/Bureau/These/1_WR_ERA5/Clustering/mask_clust.nc')
-cluster_mod = pd.read_csv('/home/savaryo/Bureau/These/1_WR_ERA5/Weather_regime/clusters_1960_2022.csv').values.T[0]
-REGIMES = xr.open_dataset('/home/savaryo/Bureau/These/1_WR_ERA5/Weather_regime/regimes_1960_2022.nc').chunk({'latitude' :50, 'longitude' :50}).load()
+mask_cluster = xr.open_dataset(repository + '1_WR_ERA5/Clustering/mask_clust.nc')
+cluster_mod = pd.read_csv(repository + '1_WR_ERA5/Weather_regime/clusters_1960_2022.csv').values.T[0]
+REGIMES = xr.open_dataset(repository + '1_WR_ERA5/Weather_regime/regimes_1960_2022.nc').chunk({'latitude' :50, 'longitude' :50}).load()
 
-REGIMES_bueller = xr.open_dataset('/home/savaryo/Bureau/These/1_WR_ERA5/Weather_regime/regimes_1960_2022_bueller.nc')
-zg500_ctr2 = xr.open_dataset('/home/savaryo/Bureau/These/ERA5/zg500/zg500_detrend_1960_2023.nc').load().chunk({'time':1000,'latitude' : 20, 'longitude' : 20}).isel(time= slice(0,-16))
+REGIMES_bueller = xr.open_dataset(repository + '1_WR_ERA5/Weather_regime/regimes_1960_2022_bueller.nc')
+zg500_ctr2 = xr.open_dataset(repository + 'ERA5/zg500/zg500_detrend_1960_2023.nc').load().chunk({'time':1000,'latitude' : 20, 'longitude' : 20}).isel(time= slice(0,-16))
 
 lonmin=-75
 lonmax=64
@@ -229,7 +229,7 @@ cbar = fig.colorbar(g,cax = None, ax = axe[:,:],  extendrect=True, aspect=65, lo
 cbar.ax.tick_params(labelsize=50)
 cbar.set_label(label = 'Geopotential height anomaly [gpm]', size=50, weight='bold')
 
-plt.savefig('/home/savaryo/Bureau/These/figures/WR.svg')
+plt.savefig(repository + 'figures/WR.svg')
 
 plt.show()
 
