@@ -1,8 +1,8 @@
 import xarray as xr
 import numpy as np
 
-EOF_1991_2020 = xr.open_dataset('/home/savaryo/Bureau/These/1_WR_ERA5/EOF/eofs_1991_2020.nc')
-pcs_1991_2020 = xr.open_dataset('/home/savaryo/Bureau/These/1_WR_ERA5/EOF/pcs_1991_2020.nc')
+EOF_1991_2020 = xr.open_dataset(repository + '1_WR_ERA5/EOF/eofs_1991_2020.nc')
+pcs_1991_2020 = xr.open_dataset(repository + '1_WR_ERA5/EOF/pcs_1991_2020.nc')
 
 n_clust = 7
 n_composante = 13
@@ -82,7 +82,7 @@ cluster_1991_2020 = kmeans.predict(pcs_T_1991_2020)
 cluster_1991_2020 = cluster_1991_2020+1
 # Centroid values
 centroids = kmeans.cluster_centers_
-pd.DataFrame(centroids).to_csv('/home/savaryo/Bureau/These/1_WR_ERA5/Weather_regime/temp_centroids.csv', index=False)
+pd.DataFrame(centroids).to_csv(repository + '1_WR_ERA5/Weather_regime/temp_centroids.csv', index=False)
 
 from scipy.spatial.distance import cdist
 distance = cdist(centroids, pcs_T_1991_2020).T
@@ -91,8 +91,8 @@ cluster_mod_1991_2020_bis = np.array(declassification(cluster_1991_2020,jours_mi
 cluster_mod_1991_2020_bis[[i for i in range(0,len(distance)) if (distance[i]>=4.5).all()]] = 0
 cluster_mod_1991_2020 = np.array(renumeroter_clusters(cluster_mod_1991_2020_bis, cluster_mod_1991_2020_bis))
 
-pd.DataFrame(cluster_mod_1991_2020).to_csv('/home/savaryo/Bureau/These/1_WR_ERA5/Weather_regime/clusters_1991_2020.csv', index=False)
-#pd.DataFrame(cluster_mod_1991_2020).to_csv('/home/savaryo/Bureau/These/ERA5/psl/clusters_1991_2020_SLP.csv', index=False)
+pd.DataFrame(cluster_mod_1991_2020).to_csv(repository + '1_WR_ERA5/Weather_regime/clusters_1991_2020.csv', index=False)
+#pd.DataFrame(cluster_mod_1991_2020).to_csv(repository + 'ERA5/psl/clusters_1991_2020_SLP.csv', index=False)
 
 new_centroids = np.zeros(np.shape(centroids))
 for i in range(0,7):
@@ -102,11 +102,11 @@ for i in range(0,7):
 
 
 
-zg500 = xr.open_dataset('/home/savaryo/Bureau/These/ERA5/zg500/zg500_normalized_anomalies.nc').chunk({'time':1000,'latitude' : 20, 'longitude' : 20}).load()
+zg500 = xr.open_dataset(repository + 'ERA5/zg500/zg500_normalized_anomalies.nc').chunk({'time':1000,'latitude' : 20, 'longitude' : 20}).load()
 zg500_notnan = zg500.sel(time = zg500['time'].dt.year.isin(np.arange(1960,2023))).isel(time = slice(0,-16)).zg500
 zg500_notnan = zg500_notnan.coarsen(longitude=2, latitude=2, boundary='trim').mean()
 
-EOF_1991_2020 = xr.open_dataset('/home/savaryo/Bureau/These/1_WR_ERA5/EOF/eofs_1991_2020.nc').eofs
+EOF_1991_2020 = xr.open_dataset(repository + '1_WR_ERA5/EOF/eofs_1991_2020.nc').eofs
 EOF_1991_2020 = EOF_1991_2020.sel(mode = EOF_1991_2020['mode'].isin(np.arange(0,14)), drop = True)
 
 EOF_1991_2020_st = EOF_1991_2020.stack(space=("latitude", "longitude")) # (mode, points)
@@ -144,25 +144,25 @@ DA_correlation[[i for i in range(0,len(distance)) if (distance[i]>=4.5).all()]] 
 cluster_mod_1960_2022_bis = np.array(declassification(DA_correlation,jours_min=3))
 
 cluster_mod_1960_2022 = np.array(renumeroter_clusters(cluster_mod_1960_2022_bis ,cluster_mod_1960_2022_bis ))
-pd.DataFrame(cluster_mod_1960_2022).to_csv('/home/savaryo/Bureau/These/1_WR_ERA5/Weather_regime/clusters_1960_2022.csv', index=False)
+pd.DataFrame(cluster_mod_1960_2022).to_csv(repository + '1_WR_ERA5/Weather_regime/clusters_1960_2022.csv', index=False)
 
 
 
-zg500 = xr.open_dataset('/home/savaryo/Bureau/These/ERA5/zg500/zg500_normalized_anomalies.nc')
+zg500 = xr.open_dataset(repository + 'ERA5/zg500/zg500_normalized_anomalies.nc')
 zg500_notnan = zg500.sel(time = zg500['time'].dt.year.isin(np.arange(1960,2023))).isel(time = slice(0,-16))
 R = []
 for reg in range(0,n_clust+1):
     R.append(zg500_notnan.isel({'time': cluster_mod_1960_2022 == reg}))
 REGIMES = xr.concat(R, dim = 'regime').mean('time')
-REGIMES.to_netcdf('/home/savaryo/Bureau/These/1_WR_ERA5/Weather_regime/regimes_1960_2022.nc')
+REGIMES.to_netcdf(repository + '1_WR_ERA5/Weather_regime/regimes_1960_2022.nc')
 
 
 
-cluster_mod_1960_2022 = pd.read_csv('/home/savaryo/Bureau/These/1_WR_ERA5/Weather_regime/clusters_1960_2022.csv').values.T[0]
-zg500 = xr.open_dataset('/home/savaryo/Bureau/These/ERA5/zg500/zg500_filtered_anomalies.nc')
+cluster_mod_1960_2022 = pd.read_csv(repository + '1_WR_ERA5/Weather_regime/clusters_1960_2022.csv').values.T[0]
+zg500 = xr.open_dataset(repository + 'ERA5/zg500/zg500_filtered_anomalies.nc')
 zg500_notnan = zg500.sel(time = zg500['time'].dt.year.isin(np.arange(1960,2023))).isel(time = slice(0,-16))
 R = []
 for reg in range(0,n_clust+1):
     R.append(zg500_notnan.isel({'time': cluster_mod_1960_2022 == reg}))
 REGIMES_bueller = xr.concat([R[i].mean(dim = 'time') for i in range(0,len(R))], dim = 'regime')
-REGIMES_bueller.to_netcdf('/home/savaryo/Bureau/These/1_WR_ERA5/Weather_regime/regimes_1960_2022_bueller.nc')
+REGIMES_bueller.to_netcdf(repository + '1_WR_ERA5/Weather_regime/regimes_1960_2022_bueller.nc')
