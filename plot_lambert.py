@@ -69,6 +69,9 @@ REGIME_NAME = ['Regime 0','Zonal Regime (ZO)', 'Greenland Blocking (GBL)','Europ
 REGIME_NAME_RED = ['WR0','ZO','GBL','EuBL','AR','MTr','AT','ScBL']
 
 
+
+repository = '...'
+
 def plot_lambert(champ, champ_contour, bounds, ax, fig, label, cm_norm, bounds_cm, contour, grid, title, colorbar):
     # Réalise le tracé d'un champ, sur la plage spatiale définie dans bounds = [lonmin,lonmax,latmin,latmax], sur l'axe existant ax,
     # en appliquant un label, aux limites de colorbar bounds_cm, avec la possibilité de rajouter les contours et d'afficher la grille
