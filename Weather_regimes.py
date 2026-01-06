@@ -7,6 +7,8 @@ pcs_1991_2020 = xr.open_dataset(repository + '1_WR_ERA5/EOF/pcs_1991_2020.nc')
 n_clust = 7
 n_composante = 13
 
+repository = '...'
+
 def declassification(cluster,jours_min):
     result = []
     count = 1
